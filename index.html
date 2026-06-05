@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mr-david // Cyber Security Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    /* ─── Stark Minimal Dark Theme Variables ──────────────── */
+    :root {
+      --bg-pure:      #000000;
+      --bg-surface:   rgba(9, 9, 11, 0.85); 
+      --bg-card:      rgba(14, 14, 17, 0.9);
+      --border-subtle:#1f1f23;
+      --text-main:    #ffffff;
+      --text-muted:   #a1a1aa;
+      --accent-neon:  #ffffff;
+      --font-sans:    'Plus Jakarta Sans', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+      --transition:   0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── Base Reset ────────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background-color: var(--bg-pure); }
+    body {
+      background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
+                  url('https://images.unsplash.com/photo-1638376776402-9a4b75fe21bb?q=80&w=977&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ─── Navigation Bar ────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 6%; z-index: 1000;
+    }
+    .nav-brand {
+      text-decoration: none; color: var(--text-main);
+      font-weight: 700; font-size: 1.1rem; letter-spacing: -0.5px;
+    }
+    .nav-menu { display: flex; gap: 30px; list-style: none; }
+    .nav-link {
+      text-decoration: none; color: var(--text-muted);
+      font-size: 0.9rem; font-weight: 500; transition: var(--transition);
+    }
+    .nav-link:hover { color: var(--text-main); }
+
+    /* ─── Two-Column Layout Base ────────────────────────── */
+    .container { max-width: 1200px; margin: 90px auto 40px; padding: 0 4%; }
+    
+    .workspace-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    /* ─── Left Sidebar (Profile & Organized Socials) ─────── */
+    .sidebar {
+      position: sticky; top: 100px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .sidebar-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: 12px; padding: 24px; text-align: center;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .profile-avatar {
+      width: 150px; height: 150px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 16px;
+      border: 1px solid var(--border-subtle);
+    }
+    .profile-name { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .profile-title { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); line-height: 1.4; margin-bottom: 20px; }
+    
+    /* Organized / Chic Social Section */
+    .social-directory {
+      display: flex; flex-direction: column; gap: 8px;
+      border-top: 1px solid var(--border-subtle); padding-top: 16px;
+    }
+    .social-row-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      text-decoration: none; color: var(--text-muted);
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      padding: 10px 14px; border-radius: 6px; font-size: 0.8rem;
+      font-family: var(--font-mono); transition: var(--transition);
+    }
+    .social-row-btn:hover {
+      color: var(--text-main); border-color: var(--text-main);
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .social-btn-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .social-btn-left i {
+      font-size: 0.95rem;
+      width: 16px;
+      text-align: center;
+    }
+    .social-arrow { color: var(--text-muted); font-size: 0.75rem; }
+
+    /* ─── Main Content Panels (Right Column) ────────────── */
+    .main-panel { display: flex; flex-direction: column; gap: 40px; }
+    .panel-section { 
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 32px;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .section-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 20px; color: var(--text-main); border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; }
+
+    /* About Specifications */
+    .about-p { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 16px; font-weight: 400; line-height: 1.7; }
+    .about-p strong { color: var(--text-main); }
+    .about-quote { font-style: italic; color: var(--text-main); border-left: 2px solid var(--text-main); padding-left: 14px; margin: 24px 0 10px; font-size: 0.95rem; font-family: var(--font-mono); }
+
+    /* Skills Grid & Cards Animation */
+    .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .skill-box { 
+      background: var(--bg-card); 
+      border: 1px solid var(--border-subtle); 
+      padding: 16px; 
+      border-radius: 6px;
+      transition: var(--transition);
+    }
+    .skill-box:hover {
+      border-color: var(--text-main);
+      background: rgba(14, 14, 17, 0.6);
+      transform: translateY(-2px);
+    }
+    .skill-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .skill-desc { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Write-up Cards (Enhanced Hover Effects) */
+    .writeups-stack { display: flex; flex-direction: column; gap: 16px; }
+    .writeup-row-card {
+      background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 8px; display: flex; overflow: hidden; min-height: 150px;
+      transition: var(--transition); text-decoration: none; color: inherit;
+    }
+    .writeup-row-card:hover { 
+      border-color: var(--text-main); 
+      transform: translateX(4px);
+      background: rgba(14, 14, 17, 0.6);
+    }
+    .writeup-body { flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+    .writeup-headline { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 6px; color: var(--text-main); }
+    .writeup-summary { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; }
+    .writeup-tags { display: flex; gap: 6px; }
+    .tag-badge { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); border: 1px solid var(--border-subtle); padding: 1px 6px; border-radius: 4px; }
+    
+    /* Image Section for Write-ups */
+    .writeup-img-side { width: 150px; flex-shrink: 0; background: #111; position: relative; border-left: 1px solid var(--border-subtle); }
+    .writeup-thumb { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ─── Contact Form ───────────────────────────────────── */
+    .input-field {
+      width: 100%; background: var(--bg-card); border: 1px solid var(--border-subtle);
+      border-radius: 6px; padding: 12px; color: var(--text-main); font-family: inherit;
+      font-size: 0.9rem; margin-bottom: 12px; transition: var(--transition);
+    }
+    .input-field:focus { outline: none; border-color: var(--text-muted); }
+    .btn-submit {
+      width: 100%; background: var(--text-main); color: var(--bg-pure);
+      border: none; border-radius: 6px; padding: 12px; font-weight: 600;
+      font-size: 0.9rem; cursor: pointer; transition: var(--transition);
+    }
+    .btn-submit:hover { opacity: 0.9; }
+
+    .footer { text-align: center; padding: 40px 0; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); border-top: 1px solid var(--border-subtle); margin-top: 60px; }
+
+    /* Responsive Constraints */
+    @media (max-width: 850px) {
+      .workspace-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .writeup-img-side { width: 100px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="#" class="nav-brand">mr-david</a>
+    <ul class="nav-menu">
+      <li><a href="#about" class="nav-link">About</a></li>
+      <li><a href="#skills" class="nav-link">Skills</a></li>
+      <li><a href="#writeups" class="nav-link">Write-ups</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="workspace-layout">
+      
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <img class="profile-avatar" src="https://media.licdn.com/dms/image/v2/D4E03AQEe0FZiFv3Qsg/profile-displayphoto-scale_400_400/B4EZnlC1zYHcAg-/0/1760484352743?e=1782345600&v=beta&t=wmGY36JII2s9qtaJuuUx6jrvxLQpHtIbvVQtnFEOH7E" alt="David Demean" onerror="this.src='https://raw.githubusercontent.com/mohamed-goodv/mohamed-goodv.github.io/main/avatar.jpg'">
+          <div class="profile-name">David Demean</div>
+          <div class="profile-title">Web penetration tester<br>Bug Bounty Hunter<br>CTF Player</div>
+          
+          <div class="social-directory">
+            <a href="https://github.com/daviddemean" target="_blank" class="social-row-btn">
+              <span class="social-btn-left"><i class="fa-brands fa-github"></i> GitHub</span> <span class="social-arrow">→</span>
+            </a>
+            <a href="https://www.linkedin.com/in/david-demean-93a4b0302/" target="_blank" class="social-row-btn">
+              <span class="social-btn-left"><i class="fa-brands fa-linkedin-in"></i> LinkedIn</span> <span class="social-arrow">→</span>
+            </a>
+            <a href="https://hackerone.com/mr-david?type=user" target="_blank" class="social-row-btn">
+              <span class="social-btn-left"><i class="fa-solid fa-user-secret"></i> HackerOne</span> <span class="social-arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        
+        <section id="about" class="panel-section" style="padding-top: 32px;">
+          <h2 class="section-title">About Me</h2>
+          <p class="about-p">Hi, I’m <strong>David Demean</strong> — a passionate <strong>Web Penetration Tester</strong> and <strong>Bug Bounty Hunter</strong> with a focus on application security. I have experience in testing the security of web and API applications for well-known companies across the globe. In addition to my work as a penetration tester, I also operate as an independent <strong>Security Researcher</strong> at HackerOne, helping companies secure their online assets.</p>
+          <p class="about-p">I am highly skilled in identifying vulnerabilities in applications and have a strong understanding of the <strong>OWASP Top 10</strong> Web Application Security Risks. I am constantly learning and staying up to date with the latest technologies and offensive security techniques in the field.</p>
+          
+          <div class="about-quote">“Security is a myth”</div>
+        </section>
+
+        <section id="skills" class="panel-section" style="padding-top: 32px;">
+          <h2 class="section-title">Core Expertise</h2>
+          <div class="skills-grid">
+            <div class="skill-box">
+              <div class="skill-name">Vulnerability Research</div>
+              <div class="skill-desc">Deep-dive assessment into custom API setups, GraphQL structures, and complex identity redirect flows to uncover critical logical flaws.</div>
+            </div>
+            <div class="skill-box">
+              <div class="skill-name">Web Application Pentesting</div>
+              <div class="skill-desc">Deep-dive analysis of web layers, complex input boundaries, and critical server-side vulnerabilities like SSRF, Race Conditions, and injection flaws.</div>
+            </div>
+            <div class="skill-box">
+              <div class="skill-name">Recon Automation</div>
+              <div class="skill-desc">Developing custom, multi-threaded recon scanners and asset discovery pipelines using Python and Go to map out complex attack surfaces efficiently.</div>
+            </div>
+            <div class="skill-box">
+              <div class="skill-name">Vulnerability Reporting</div>
+              <div class="skill-desc">Crafting clear, high-impact triage reports with professional, detailed, and reproducible PoCs that clearly demonstrate the technical risk and business impact of identified flaws.</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="writeups" class="panel-section" style="padding-top: 32px;">
+          <h2 class="section-title">Write-ups</h2>
+          <div class="writeups-stack">
+            
+            <a href="writeups/race-condition-bypass.html" class="writeup-row-card">
+              <div class="writeup-body">
+                <div>
+                  <h3 class="writeup-headline">Bypassing Rate Limits via Advanced Race Conditions</h3>
+                  <p class="writeup-summary">Exploiting multi-threaded concurrency execution flaws within transactional logic endpoints to break application boundaries.</p>
+                </div>
+                <div class="writeup-tags">
+                  <span class="tag-badge">Web</span> 
+                  <span class="tag-badge">Race Condition</span>
+                  <span class="tag-badge">Concurrency</span>
+                </div>
+              </div>
+              <div class="writeup-img-side">
+                <img class="writeup-thumb" src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300" alt="Race Condition Analysis">
+              </div>
+            </a>
+
+          </div>
+        </section>
+
+        <section id="contact" class="panel-section" style="padding-top: 32px;">
+          <h2 class="section-title">Let's Work Together</h2>
+          <form id="portfolio-form" action="https://formspree.io/f/maqzqqgg" method="POST">
+            <input type="text" name="name" class="input-field" placeholder="Your Name" required>
+            <input type="email" name="_replyto" class="input-field" placeholder="Email Address" required>
+            <textarea name="message" class="input-field" rows="5" placeholder="Message Details" required></textarea>
+            <button type="submit" id="submit-btn" class="btn-submit">Send Message</button>
+          </form>
+          
+          <div id="form-status" style="display:none; color: #4ade80; font-family: var(--font-mono); font-size: 0.9rem; margin-top: 12px; text-align: center;">
+            ✔ Message sent successfully! I'll get back to you soon.
+          </div>
+
+          <script>
+            const form = document.getElementById("portfolio-form");
+            const status = document.getElementById("form-status");
+            const btn = document.getElementById("submit-btn");
+
+            form.addEventListener("submit", async function(e) {
+              e.preventDefault(); 
+              btn.innerText = "Sending...";
+              btn.disabled = true;
+
+              const data = new FormData(form);
+              const response = await fetch(form.action, {
+                method: form.method,
+                body: data,
+                headers: { 'Accept': 'application/json' }
+              });
+
+              if (response.ok) {
+                form.reset(); 
+                form.style.display = "none"; 
+                status.style.display = "block"; 
+              } else {
+                btn.innerText = "Error! Try Again";
+                btn.disabled = false;
+              }
+            });
+          </script>
+        </section>
+
+      </main>
+
+    </div>
+
+    <footer class="footer">
+      <p>© 2026 David Demean. All Rights Reserved. Strictly Legal Authorized Security Research.</p>
+    </footer>
+  </div>
+
+</body>
+</html>

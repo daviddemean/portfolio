@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bypassing Rate Limits via Advanced Race Conditions // Write-up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    /* ─── Stark Minimal Dark Theme Variables ──────────────── */
+    :root {
+      --bg-pure:      #000000;
+      --bg-surface:   rgba(9, 9, 11, 0.85); 
+      --bg-card:      rgba(14, 14, 17, 0.9);
+      --border-subtle:#1f1f23;
+      --text-main:    #ffffff;
+      --text-muted:   #a1a1aa;
+      --accent-neon:  #ffffff;
+      --font-sans:    'Plus Jakarta Sans', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+      --transition:   0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── Base Reset ────────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background-color: var(--bg-pure); }
+    body {
+      background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+                  url('https://images.unsplash.com/photo-1638376776402-9a4b75fe21bb?q=80&w=977&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.7;
+      padding: 40px 0;
+    }
+
+    .article-container {
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 0 4%;
+    }
+
+    /* ─── Back Button ───────────────────────────────────── */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-bottom: 30px;
+      transition: var(--transition);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: 6px;
+      background: var(--bg-card);
+    }
+    .back-btn:hover {
+      color: var(--text-main);
+      border-color: var(--text-main);
+    }
+
+    /* ─── Meta Section ──────────────────────────────────── */
+    .writeup-header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .writeup-title {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .metadata-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 16px;
+    }
+    .meta-item strong { color: var(--text-main); }
+
+    /* ─── Content Styling ───────────────────────────────── */
+    .writeup-content {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 40px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin: 32px 0 16px;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+    h2:first-child { margin-top: 0; }
+    p {
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-size: 1rem;
+    }
+    strong { color: var(--text-main); }
+
+    /* ─── Code Blocks ───────────────────────────────────── */
+    pre {
+      background: #09090b;
+      border: 1px solid var(--border-subtle);
+      padding: 18px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 24px 0;
+    }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e4e4e7;
+    }
+    /* Simple highlighting adjustments inside pre */
+    .c-method { color: #f43f5e; font-weight: 600; } /* HTTP Methods */
+    .c-header { color: #38bdf8; } /* Headers */
+    .c-payload { color: #a78bfa; } /* JSON/Payload variables */
+    .c-comment { color: #71717a; font-style: italic; } /* Comments */
+
+    /* ─── Callout Boxes ──────────────────────────────────── */
+    .callout {
+      border-left: 2px solid var(--text-main);
+      background: var(--bg-card);
+      padding: 16px 20px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .callout p { margin-bottom: 0; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-main); }
+
+    .footer {
+      text-align: center;
+      padding-top: 40px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="article-container">
+    
+    <!-- زر العودة المعدل للعمل بشكل ديناميكي محلياً وعلى السيرفر السحابي -->
+    <a href="../index.html" class="back-btn">
+      <i class="fa-solid fa-terminal"></i> [back to terminal]
+    </a>
+
+    <header class="writeup-header">
+      <h1 class="writeup-title">Bypassing Rate Limits via Advanced Race Conditions</h1>
+      <div class="metadata-grid">
+        <div class="meta-item"><strong>DATE:</strong> 2026-06-05</div>
+        <div class="meta-item"><strong>VULN_TYPE:</strong> Concurrency Flaw</div>
+        <div class="meta-item"><strong>SEVERITY:</strong> <span style="color: #f43f5e; font-weight: bold;">HIGH</span></div>
+        <div class="meta-item"><strong>TARGET:</strong> Transactional API Endpoints</div>
+      </div>
+    </header>
+
+    <main class="writeup-content">
+      
+      <h2>1. Executive Summary</h2>
+      <p>During an authorized security assessment, a critical architectural vulnerability was uncovered in a highly restricted transactional endpoint. The application enforces a strict rate limit on daily operations per account. However, due to improper synchronization during concurrent state updates, it was possible to bypass these restrictions entirely by exploiting a multi-threaded <strong>Race Condition</strong>.</p>
+
+      <h2>2. Vulnerability Mechanism</h2>
+      <p>The application employs a standard <code>Check -> Update</code> validation sequence. When an operational request arrives, the backend performs an independent query to check if the user's daily count has reached its limit. If the check passes, it processes the task and increments the counter database record.</p>
+      
+      <div class="callout">
+        <p>The Flaw: The validation check and database write operations are non-atomic. No rigid Mutex locks or row-level tracking isolation constraints were enforced on the thread workers.</p>
+      </div>
+
+      <p>By launching a precise burst of high-frequency parallel requests within a tiny time window (microseconds), multiple threads successfully passed the validation check simultaneously <em>before</em> any single thread could complete its database increment commit.</p>
+
+      <h2>3. Proof of Concept & Payload</h2>
+      <p>The exploit was orchestrated using a custom multi-threaded automation script configured to send 50 concurrent requests leveraging HTTP/2 multiplexing pipelines to completely synchronize the server arrival windows.</p>
+      
+      <p><strong>Base Exploitation Request:</strong></p>
+      <pre><code><span class="c-method">POST</span> /api/v1/internal/execute-action HTTP/2
+<span class="c-header">Host:</span> target-app.com
+<span class="c-header">Authorization:</span> Bearer jwt_session_token_here
+<span class="c-header">Content-Type:</span> application/json
+
+{
+  <span class="c-payload">"action_id"</span>: "98234",
+  <span class="c-payload">"execute_async"</span>: true
+}</code></pre>
+
+      <p><strong>Exploit Log Outputs:</strong></p>
+      <pre><code><span class="c-comment"># Spawn concurrent execution threads...</span>
+[+] Thread-01: Sent -> Status: 200 OK (Executed)
+[+] Thread-02: Sent -> Status: 200 OK (Executed)
+[+] Thread-03: Sent -> Status: 200 OK (Executed)
+[+] Thread-04: Sent -> Status: 200 OK (Executed)
+<span class="c-comment"># Rate limit barrier smashed before database updates locked the account context</span>
+[+] Bypassed Daily Limit: 4 actions processed within 12ms window (Limit was 1).</code></pre>
+
+      <h2>4. Remediation Strategy</h2>
+      <p>To eliminate this vulnerability class, the application architecture must migrate away from sequential non-isolated queries. The best approach is implementing an atomic database-level state tracking solution or introducing strict distributed lock constraints:</p>
+      
+      <p>1. <strong>Atomic Increments:</strong> Utilize features like SQL <code>UPDATE counter = counter + 1 WHERE ...</code> and enforce check integrity within a single database transaction blocking block.</p>
+      <p>2. <strong>Distributed Locking:</strong> Incorporate high-performance lock states (e.g., Redis-based distributed locks like <code>Redlock</code>) to map an unbreakable lock structure bound uniquely to the active user's session identifier during high-criticality checks.</p>
+
+    </main>
+
+    <footer class="footer">
+      <p>© 2026 David Demean. Confidential Penetration Testing Write-up.</p>
+    </footer>
+
+  </div>
+
+</body>
+</html>
